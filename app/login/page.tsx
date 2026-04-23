@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, } from 'react';
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, Loader2, Mail } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
@@ -9,16 +9,19 @@ const LoginPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = async(e: React.FormEvent<HTMLElement>): Promise<void> => {
     e.preventDefault();
     setLoading(true);
 
     try{
-      const {data} = await axios.post('http://localhost:5000/api/v1/login', { email });
+      const { data } = await axios.post(`http://localhost:5000/api/v1/login`, { email });
       alert(data.message)
-      router.push('/verify?email=${email}');
+      router.push(`/verify?email=${email}`);
     } catch(error: any){
-      alert(error.response.data.message)
+      console.log("Full Error:", error);
+      alert(
+        error?.response?.data?.message || error.message || "Server not reachable"
+      );
     } finally{
       setLoading(false)
     }
@@ -43,10 +46,18 @@ const LoginPage = () => {
               <label htmlFor='email' className='block text-sm font-medium text-gray-300 mb-2'>Email Address</label>
               <input type="email" id="email" className='w-full px-4 py-4 bg-gray-400 borger-gray-600 rounded-lg text-white placeholder-gray-400' placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
-            <button type="submit" className='w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'>
+            <button type="submit" className='w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed' disabled={loading}>
+              {loading ? (
+                <div className='felx items-center justify-center gap-2'>
+                  <Loader2 className='w-5 h-5'/>
+                  Sending OTP to your mail...
+                </div>
+              ) : (
               <div className='felx items-center justify-center gap-2'>
                 <span>Send Verification Code</span>
-                <ArrowRight className='w-5 h-5'/></div></button>
+                <ArrowRight className='w-5 h-5'/></div>
+              )}
+              </button>
           </form>
         </div>
       </div>
