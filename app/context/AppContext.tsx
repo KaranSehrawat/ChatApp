@@ -102,7 +102,7 @@ export const AppProvider: React.FC<AppProviderProps>= ({children})=>{
     const [users, setUsers] = useState<User[] | null>(null)
 
     async function fetchUsers(){
-        const toke = Cookies.get("token")
+        const token = Cookies.get("token")
 
         try{
             const {data} = await axios.get(`${user_service}/api/v1/user/all`, {
@@ -111,7 +111,7 @@ export const AppProvider: React.FC<AppProviderProps>= ({children})=>{
                 },
             });
 
-            setUser(data);
+            setUsers(data);
         } catch(error){
             console.log(error);
         }
